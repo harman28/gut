@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+require 'httparty'
+require 'optparse'
+require 'ostruct'
+require 'json'
+
+@options = OpenStruct.new
+@options.owner = ENV['GUT_DEFAULT_OWNER']
+@options.repo = ENV['GUT_DEFAULT_REPO']
+
+@token = ENV['GUT_TOKEN']
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: gut [options]"
+
+  opts.separator ""
+  opts.separator "Common options:"
+
+  opts.on("-o [OWNER]", "--owner [OWNER]", String,
+          "Owner of repo") do |o|
+    @options.owner = o
+  end
+
+  opts.on("-r [REPO]", "--repo [REPO]", String,
+          "Name of repo") do |r|
+    @options.repo = r
+  end
+
+  opts.on("-p [NUM]", "--pulls [NUM]", Integer,
+          "Number of the pull request") do |p|
+    @options.pull = p
+  end
+end.parse!
+
+url="https://api.github.com/repos/#{@options.owner}/#{@options.repo}/pulls/#{@options.pull}"
+
+response = HTTParty.get(url, headers: {
+    "Authorization" => "token #{@token}",
+    "User-Agent" => "GUT"
+  })
+
+p JSON.parse(response.body)

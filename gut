@@ -32,6 +32,8 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+abort("Error: Need a token, bro") if @token.empty?
+
 url="https://api.github.com/repos/#{@options.owner}/#{@options.repo}/pulls/#{@options.pull}"
 
 response = HTTParty.get(url, headers: {
